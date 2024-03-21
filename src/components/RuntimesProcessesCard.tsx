@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchJvmInstances } from '../api/api';
 import { JvmInstance, RuntimesInventoryResponse } from '../api/interfaces';
-import ProcessesAccordion from './ProcessesAccordion';
+import ProcessesAccordion from './RuntimesProcessesAccordion';
 import InventorySystemPropertiesCard from './InventorySystemPropertiesCard';
 
 /**
@@ -19,8 +19,8 @@ import InventorySystemPropertiesCard from './InventorySystemPropertiesCard';
  * happening.
  *
  * Once the runtimes-inventory information has been retrieved, the instance
- * data is passed into the ProcessesAccordion, which iterates through each
- * instance and displays information as denoted in the rowNames map.
+ * data is passed into the RuntimesProcessesAccordion, which iterates through
+ * each instance and displays information as denoted in the instanceDataRows map.
  *
  * @param hostname the fqdn of the host to display processes for
  */

@@ -12,8 +12,8 @@ import SkeletonRows from './SkeletonRows';
 
 // Modified version of the LoadingCard as seen in insights-inventory-frontend
 // See: https://github.com/RedHatInsights/insights-inventory-frontend/blob/master/src/components/GeneralInfo/LoadingCard/LoadingCard.js
-// The Runtimes content is displayed in an Accordion, so the regular way of using the loading card with formatted items is not necessary.
-// Instead, this card mimics the look and feel of the System Properties Card, and will display the Runtimes Accordion as it's content.
+// The Runtimes content is displayed in an Accordion, so the regular way of using the loading card with formatted items will not work.
+// Instead, this card mimics the look and feel of the System Properties Card, and will display the Runtimes Accordion as the content.
 const InventorySystemPropertiesCard = ({
   title,
   isLoading,

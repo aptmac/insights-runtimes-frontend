@@ -13,15 +13,15 @@ import {
 } from '@patternfly/react-core';
 import React from 'react';
 
-interface CardRows {
+interface InstanceInfoTitles {
   id: string; // JvmInstance attribute key
-  title: string; // formatted string to be displayed in the card
+  title: string; // formatted string to be displayed in the accordion content
 }
 
-// List where each entry contains the JSON attribute key and the corresponding formatted title for the card
-const rowNames: Array<CardRows> = [
+// List where each entry contains the JSON attribute key and the corresponding formatted title for the row
+const instanceDataRows: Array<InstanceInfoTitles> = [
   { id: 'workload', title: 'Workload Type' },
-  // ['deployments', 'EAP deployments'], // will need to better handle this, Deployments is an array not a singular entity
+  // ['deployments', 'EAP deployments'], // deployments is a list
   { id: 'appName', title: 'Application' },
   { id: 'javaVendor', title: 'Vendor' },
   { id: 'appUserDir', title: 'Application directory' },
@@ -31,10 +31,10 @@ const rowNames: Array<CardRows> = [
   { id: 'heapMin', title: 'Heap min' },
   { id: 'heapMax', title: 'Heap max' },
   { id: 'javaHome', title: 'Java home path' },
-  // { id: 'javaClassPath', title: 'Class path' },
+  // { id: 'javaClassPath', title: 'Class path' }, // too long and not entirely useful ?
 ];
 
-const ProcessesAccordion = ({
+const RuntimesProcessesAccordion = ({
   instances,
 }: {
   instances: JvmInstance[] | EapInstance[];
@@ -52,9 +52,10 @@ const ProcessesAccordion = ({
         : [...expanded, id];
     setExpanded(newExpanded);
   };
+  // If there is only 1 instance, default to the card being opened
   useEffect(() => {
     if (instances.length == 1) {
-      setExpanded(['0-toggle']);
+      setExpanded(['instance-0-toggle']);
     }
   }, []);
   return (
@@ -64,9 +65,9 @@ const ProcessesAccordion = ({
           return (
             <AccordionItem key={index}>
               <AccordionToggle
-                id={`${index}-toggle`}
-                onClick={() => toggle(`${index}-toggle`)}
-                isExpanded={expanded.includes(`${index}-toggle`)}
+                id={`instance-${index}-toggle`}
+                onClick={() => toggle(`instance-${index}-toggle`)}
+                isExpanded={expanded.includes(`instance-${index}-toggle`)}
                 style={{
                   // the styling for the Accordion is pulling in the pf4-v5.css
                   // these are used to make it look more like the pf5 Accordion at the moment
@@ -77,7 +78,7 @@ const ProcessesAccordion = ({
                 {instance.workload}
               </AccordionToggle>
               <AccordionContent
-                isHidden={!expanded.includes(`${index}-toggle`)}
+                isHidden={!expanded.includes(`instance-${index}-toggle`)}
                 style={{
                   // by default the Accordion content is smaller and light gray, which is kind of hard to read
                   // use the following styling to better match the mockups
@@ -86,7 +87,7 @@ const ProcessesAccordion = ({
                 }}
               >
                 <TextList component={TextListVariants.dl}>
-                  {rowNames.map((row) => {
+                  {instanceDataRows.map((row) => {
                     return (
                       <Fragment key={`${row.id} title`}>
                         <TextListItem
@@ -117,4 +118,4 @@ const ProcessesAccordion = ({
   );
 };
 
-export default ProcessesAccordion;
+export default RuntimesProcessesAccordion;
