@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchRuntimesInstances } from '../api/api';
+import { fetchJvmInstances } from '../api/api';
 import { JvmInstance, RuntimesInventoryResponse } from '../api/interfaces';
 import ProcessesAccordion from './ProcessesAccordion';
 import InventorySystemPropertiesCard from './InventorySystemPropertiesCard';
@@ -11,8 +11,9 @@ const RuntimesProcessesCard = ({ hostname }: { hostname: string }) => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response: RuntimesInventoryResponse =
-          await fetchRuntimesInstances(hostname);
+        const response: RuntimesInventoryResponse = await fetchJvmInstances(
+          hostname
+        );
         const instances: JvmInstance[] = response?.response;
         setInstances(instances);
       } catch (error) {
