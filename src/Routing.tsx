@@ -1,13 +1,24 @@
-import React, { Suspense, useMemo } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import React, { Suspense, lazy, useMemo } from 'react';
+import { Route as RouterRoute, Routes as RouterRoutes } from 'react-router-dom';
 import { InvalidObject } from '@redhat-cloud-services/frontend-components/InvalidObject';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 
+const InventoryTable = lazy(
+  () => import('./components/InventoryTable/InventoryTable')
+);
+const InventoryDetail = lazy(
+  () => import('./components/InventoryDetail/InventoryDetail')
+);
+
 const routes = [
-  // {
-  //   path: '/',
-  //   element: InvalidObject,
-  // },
+  {
+    path: '/',
+    element: InventoryTable,
+  },
+  {
+    path: '/:runtimesId',
+    element: InventoryDetail,
+  },
   /* Catch all unmatched routes */
   {
     route: {
@@ -26,9 +37,9 @@ interface RouteType {
 
 const renderRoutes = (routes: RouteType[] = []) =>
   routes.map(({ path, element: Element, childRoutes, elementProps }) => (
-    <Route key={path} path={path} element={<Element {...elementProps} />}>
+    <RouterRoute key={path} path={path} element={<Element {...elementProps} />}>
       {renderRoutes(childRoutes)}
-    </Route>
+    </RouterRoute>
   ));
 
 const Routing = () => {
@@ -41,7 +52,7 @@ const Routing = () => {
         </Bullseye>
       }
     >
-      <Routes>{renderedRoutes}</Routes>
+      <RouterRoutes>{renderedRoutes}</RouterRoutes>
     </Suspense>
   );
 };
