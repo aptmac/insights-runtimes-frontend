@@ -29,6 +29,8 @@ import {
 import { formatInstancesData } from '../../utils/utils';
 import FilterIcon from '@patternfly/react-icons/dist/esm/icons/filter-icon';
 import EllipsisVIcon from '@patternfly/react-icons/dist/esm/icons/ellipsis-v-icon';
+import RuntimesProcessesCard from '../RuntimesProcessesCard';
+import ProcessesAccordion from '../RuntimesProcessesAccordion';
 
 const tableColumns: string[] = [
   'Name',
@@ -42,6 +44,16 @@ const InventoryTable = () => {
   const [instances, setInstances] = useState<JvmInstance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [expandedNames, setExpandedNames] = React.useState<string[]>([]);
+  const setExpanded = (instance: JvmInstance, isExpanding = true) =>
+    setExpandedNames((prevExpanded) => {
+      const otherExpandedNames = prevExpanded.filter((t) => t !== instance.id);
+      return isExpanding
+        ? [...otherExpandedNames, instance.id]
+        : otherExpandedNames;
+    });
+  const isExpanded = (instance: JvmInstance) =>
+    expandedNames.includes(instance.id);
 
   const onToggle = () => {
     setIsOpen(!isOpen);
@@ -79,123 +91,275 @@ const InventoryTable = () => {
       <PageHeader className="pf-m-light">
         <PageHeaderTitle title="Middleware Inventory" />
         <TextContent>
-          <Text component="p">This is a POC demonstration for a Middleware Inventory page.</Text>
+          <Text component="p">
+            This is a POC demonstration for a Middleware Inventory page.
+          </Text>
         </TextContent>
       </PageHeader>
-      <Main>
-        <Toolbar>
-          <ToolbarContent>
-            <ToolbarItem>
-              <Select
-                toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-                  <MenuToggle
-                    ref={toggleRef}
-                    onClick={() => onToggle('first')}
-                    isExpanded={false}
-                    style={
-                      {
-                        width: '88px',
-                      } as React.CSSProperties
-                    }
-                  >
-                    {'Name'}
-                  </MenuToggle>
-                )}
-              ></Select>
-            </ToolbarItem>
-            <ToolbarItem variant="search-filter">
-              <SearchInput aria-label="Items example search input" />
-            </ToolbarItem>
-            <ToolbarItem>
-              <Button variant="secondary">Delete</Button>
-            </ToolbarItem>
-            <ActionList>
-              <ActionListItem>
-                <Dropdown
+
+      <React.Fragment>
+        <Main>
+          <PageHeaderTitle title="POC 1 - Goes into a dedicated Instance Detail page when using the link"></PageHeaderTitle>
+          <Toolbar>
+            <ToolbarContent>
+              <ToolbarItem>
+                <Select
                   toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
                     <MenuToggle
                       ref={toggleRef}
-                    //   onClick={onToggle()}
-                      variant="plain"
-                      isExpanded={isOpen}
-                      aria-label="Action list single group kebab"
+                      onClick={() => onToggle('first')}
+                      isExpanded={false}
+                      style={
+                        {
+                          width: '88px',
+                        } as React.CSSProperties
+                      }
                     >
-                      <EllipsisVIcon />
+                      {'Name'}
                     </MenuToggle>
                   )}
-                ></Dropdown>
-              </ActionListItem>
-            </ActionList>
-            <ToolbarItem variant="pagination" align={{ default: 'alignRight' }}>
-              <Pagination itemCount={instances.length} perPage={10} page={1} />
-            </ToolbarItem>
-          </ToolbarContent>
-        </Toolbar>
-        <Table aria-label="Middleware Inventory table">
-          <Thead>
-            <Tr>
-              <Td
-                select={{
-                  rowIndex: 0,
-                  onSelect: (_event, isSelecting) => console.log('hi'),
-                  isSelected: false,
-                }}
-              />
-              {tableColumns.map((column) => {
+                ></Select>
+              </ToolbarItem>
+              <ToolbarItem variant="search-filter">
+                <SearchInput aria-label="Items example search input" />
+              </ToolbarItem>
+              <ToolbarItem>
+                <Button variant="secondary">Delete</Button>
+              </ToolbarItem>
+              <ActionList>
+                <ActionListItem>
+                  <Dropdown
+                    toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                      <MenuToggle
+                        ref={toggleRef}
+                        //   onClick={onToggle()}
+                        variant="plain"
+                        isExpanded={isOpen}
+                        aria-label="Action list single group kebab"
+                      >
+                        <EllipsisVIcon />
+                      </MenuToggle>
+                    )}
+                  ></Dropdown>
+                </ActionListItem>
+              </ActionList>
+              <ToolbarItem
+                variant="pagination"
+                align={{ default: 'alignRight' }}
+              >
+                <Pagination
+                  itemCount={instances.length}
+                  perPage={10}
+                  page={1}
+                />
+              </ToolbarItem>
+            </ToolbarContent>
+          </Toolbar>
+          <Table aria-label="Middleware Inventory table">
+            <Thead>
+              <Tr>
+                <Td
+                  select={{
+                    rowIndex: 0,
+                    onSelect: (_event, isSelecting) => console.log('hi'),
+                    isSelected: false,
+                  }}
+                />
+                {tableColumns.map((column) => {
+                  return (
+                    <Th modifier="wrap" key={column}>
+                      {column}
+                    </Th>
+                  );
+                })}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {instances.map((instance) => {
                 return (
-                  <Th modifier="wrap" key={column}>
-                    {column}
-                  </Th>
+                  <Tr key={instance.id}>
+                    <Td
+                      select={{
+                        rowIndex: 0,
+                        onSelect: (_event, isSelecting) => console.log('hi'),
+                        isSelected: false,
+                      }}
+                    />
+                    <Td dataLabel={tableColumns[0]}>
+                      <a
+                        href={`/openshift/middleware-inventory/${instance.id}`}
+                      >
+                        {instance.appName}
+                      </a>
+                    </Td>
+                    <Td dataLabel={tableColumns[1]}>{instance.hostname}</Td>
+                    <Td dataLabel={tableColumns[2]}>{instance.workload}</Td>
+                    <Td dataLabel={tableColumns[3]}>{instance.created}</Td>
+                    <ActionList>
+                      <ActionListItem>
+                        <Dropdown
+                          toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                            <MenuToggle
+                              ref={toggleRef}
+                              onClick={onToggle}
+                              variant="plain"
+                              isExpanded={isOpen}
+                              aria-label="Action list single group kebab"
+                            >
+                              <EllipsisVIcon />
+                            </MenuToggle>
+                          )}
+                        ></Dropdown>
+                      </ActionListItem>
+                    </ActionList>
+                  </Tr>
                 );
               })}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {instances.map((instance) => {
+            </Tbody>
+          </Table>
+          <Pagination
+            itemCount={instances.length}
+            perPage={10}
+            page={1}
+            variant={PaginationVariant.bottom}
+          />
+        </Main>
+      </React.Fragment>
+
+      <React.Fragment>
+        <Main>
+          <PageHeaderTitle title="POC 2 - For faster inclusion, use a dropdown table to display information for now"></PageHeaderTitle>
+          <Toolbar>
+            <ToolbarContent>
+              <ToolbarItem>
+                <Select
+                  toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                    <MenuToggle
+                      ref={toggleRef}
+                      onClick={() => onToggle('first')}
+                      isExpanded={false}
+                      style={
+                        {
+                          width: '88px',
+                        } as React.CSSProperties
+                      }
+                    >
+                      {'Name'}
+                    </MenuToggle>
+                  )}
+                ></Select>
+              </ToolbarItem>
+              <ToolbarItem variant="search-filter">
+                <SearchInput aria-label="Items example search input" />
+              </ToolbarItem>
+              <ToolbarItem>
+                <Button variant="secondary">Delete</Button>
+              </ToolbarItem>
+              <ActionList>
+                <ActionListItem>
+                  <Dropdown
+                    toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                      <MenuToggle
+                        ref={toggleRef}
+                        //   onClick={onToggle()}
+                        variant="plain"
+                        isExpanded={isOpen}
+                        aria-label="Action list single group kebab"
+                      >
+                        <EllipsisVIcon />
+                      </MenuToggle>
+                    )}
+                  ></Dropdown>
+                </ActionListItem>
+              </ActionList>
+              <ToolbarItem
+                variant="pagination"
+                align={{ default: 'alignRight' }}
+              >
+                <Pagination
+                  itemCount={instances.length}
+                  perPage={10}
+                  page={1}
+                />
+              </ToolbarItem>
+            </ToolbarContent>
+          </Toolbar>
+          <Table aria-label="Middleware Inventory table2">
+            <Thead>
+              <Tr>
+                <Th
+                  select={{
+                    rowIndex: 0,
+                    onSelect: (_event, isSelecting) => console.log('hi'),
+                    isSelected: false,
+                  }}
+                />
+                {tableColumns.map((column) => {
+                  return (
+                    <Th modifier="wrap" key={column}>
+                      {column}
+                    </Th>
+                  );
+                })}
+              </Tr>
+            </Thead>
+            {instances.map((instance, i) => {
               return (
-                <Tr key={instance.id}>
-                  <Td
-                    select={{
-                      rowIndex: 0,
-                      onSelect: (_event, isSelecting) => console.log('hi'),
-                      isSelected: false,
-                    }}
-                  />
-                  <Td dataLabel={tableColumns[0]}>
-                    <a href={`/openshift/middleware-inventory/${instance.id}`}>{instance.appName}</a>
-                  </Td>
-                  <Td dataLabel={tableColumns[1]}>{instance.hostname}</Td>
-                  <Td dataLabel={tableColumns[2]}>{instance.workload}</Td>
-                  <Td dataLabel={tableColumns[3]}>{instance.created}</Td>
-                  <ActionList>
-                    <ActionListItem>
-                      <Dropdown
-                        toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
-                          <MenuToggle
-                            ref={toggleRef}
-                            onClick={onToggle}
-                            variant="plain"
-                            isExpanded={isOpen}
-                            aria-label="Action list single group kebab"
-                          >
-                            <EllipsisVIcon />
-                          </MenuToggle>
-                        )}
-                      ></Dropdown>
-                    </ActionListItem>
-                  </ActionList>
-                </Tr>
+                <Tbody key={instance.id}>
+                  <Tr>
+                    <Td
+                      expand={{
+                        rowIndex: i,
+                        isExpanded: isExpanded(instance),
+                        onToggle: () =>
+                          setExpanded(instance, !isExpanded(instance)),
+                        expandId: 'composable-nested-expandable-example',
+                      }}
+                    />
+                    <Td>{instance.appName}</Td>
+                    <Td>{instance.hostname}</Td>
+                    <Td>{instance.workload}</Td>
+                    <Td>{instance.created}</Td>
+                    <ActionList>
+                      <ActionListItem>
+                        <Dropdown
+                          toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
+                            <MenuToggle
+                              ref={toggleRef}
+                              onClick={onToggle}
+                              variant="plain"
+                              isExpanded={isOpen}
+                              aria-label="Action list single group kebab"
+                            >
+                              <EllipsisVIcon />
+                            </MenuToggle>
+                          )}
+                        ></Dropdown>
+                      </ActionListItem>
+                    </ActionList>
+                  </Tr>
+                  <Tr isExpanded={isExpanded(instance)}>
+                    <Td
+                      dataLabel={`Instance ${instance.id} description`}
+                      colSpan={8}
+                    >
+                      <ProcessesAccordion
+                        instances={[instance]}
+                      ></ProcessesAccordion>
+                    </Td>
+                  </Tr>
+                </Tbody>
               );
             })}
-          </Tbody>
-        </Table>
-        <Pagination
-          itemCount={instances.length}
-          perPage={10}
-          page={1}
-          variant={PaginationVariant.bottom}
-        />
-      </Main>
+          </Table>
+          <Pagination
+            itemCount={instances.length}
+            perPage={10}
+            page={1}
+            variant={PaginationVariant.bottom}
+          />
+        </Main>
+      </React.Fragment>
     </React.Fragment>
   );
 };
