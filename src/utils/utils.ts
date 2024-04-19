@@ -27,7 +27,14 @@ export const formatInstancesData = (instances: JvmInstance[]) => {
       instance.title = instance.appName;
     }
     // format the date string
-    instance.created = new Date(instance.created).toLocaleString();
+    // TODO: revisit how the date is returned from runtimes-inventory
+    // In the event that a ZonedDateTime string cannot be parsed by new Date(), the assigned
+    // value becomes 'Invalid Date' and no error is thrown. For now, try the date conversion
+    // and if it falls through then use the default ZonedDateTime for now.
+    const parsedCreated = new Date(instance.created).toLocaleString();
+    if (parsedCreated !== 'Invalid Date') {
+      instance.created = parsedCreated;
+    }
     // format the GC details string
     const regex = new RegExp('gc::(.*?)::(.*?)$');
     const match = regex.exec(instance.jvmHeapGcDetails);
