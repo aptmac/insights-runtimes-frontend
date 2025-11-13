@@ -54,8 +54,9 @@ module.exports = {
       // Host Inventory Runtimes Processes Card
       './RuntimesProcessesCard': resolve(
         __dirname,
-        '/src/components/RuntimesProcessesCard.tsx'
+        '/src/components/RuntimesProcessesCard.tsx',
       ),
+      './HelloWorld': resolve(__dirname, '/src/pages/HelloWorld.tsx'),
     },
   },
 };

@@ -25,6 +25,11 @@ objects:
         manifestLocation: '/apps/runtimes/fed-mods.json'
         # Frontend Operator Migration - effective September 30, 2025 this is where to declare modules for the frontend app
         # See: https://github.com/RedHatInsights/chrome-service-backend/blob/main/docs/feo-migration-guide.md#fed-modulesjson-replacement
+        modules:
+        - id: helloworld
+          module: "./HelloWorld"
+          routes:
+          -  pathname: "runtimes/helloworld"
 
 parameters:
   - name: ENV_NAME
